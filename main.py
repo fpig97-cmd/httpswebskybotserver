@@ -1,16 +1,26 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import os
+import aiohttp
 
 app = FastAPI()
 
 @app.get("/api/stats")
-def get_stats():
+async def get_stats():
+    try:
+        # Discord Bot API 호출 (8001 포트)
+        async with aiohttp.ClientSession() as session:
+            async with session.get("http://localhost:8001/api/bot-stats", timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                if resp.status == 200:
+                    return await resp.json()
+    except Exception as e:
+        print(f"Bot API error: {e}")
+    
+    # Bot이 안 떠있으면 임시값 반환
     return {
-        "guilds": 42,
-        "verified_users": 1250,
-        "warn_records": 18,
-        "status": "online"
+        "guilds": 0,
+        "verified_users": 0,
+        "warn_records": 0,
     }
 
 @app.get("/api/errors")
