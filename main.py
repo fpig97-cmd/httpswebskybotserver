@@ -5,8 +5,13 @@ import aiohttp
 
 app = FastAPI()
 
-@app.get("/api/stats")
-async def get_stats():
+@app.get("/api/bot-stats")
+async def bot_stats():
+    print("Bot stats API called!")  # ← 호출됐는지 확인
+    if not bot.is_ready():
+        return {"guilds": 0, "verified_users": 0, "warn_records": 0}
+    
+    guilds_count = len(bot.guilds)
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get("https://surprising-perfection-production-e015.up.railway.app:8001/api/bot-stats", timeout=aiohttp.ClientTimeout(total=5)) as resp:
@@ -31,3 +36,4 @@ def get_errors():
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+
