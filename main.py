@@ -35,12 +35,24 @@ async def get_stats():
     }
 
 @app.get("/api/errors")
-def get_errors():
-    return [
-        {"timestamp": "2026-03-08 16:30:45", "message": "Connection timeout on guild sync"},
-        {"timestamp": "2026-03-08 16:25:12", "message": "Database query exceeded timeout"},
-        {"timestamp": "2026-03-08 16:15:33", "message": "Rate limit warning from Discord API"},
-    ]
+async def get_errors():
+    """Bot에서 에러 로그 가져오기"""
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                "https://fortunate-emotion-production-e4f7.up.railway.app/api/errors",
+                timeout=aiohttp.ClientTimeout(total=5),
+                ssl=False
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    print(f"Got {len(data)} error logs")
+                    return data
+    except Exception as e:
+        print(f"Error logs API error: {e}")
+    
+    return []
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+
