@@ -5,31 +5,16 @@ import aiohttp
 
 app = FastAPI()
 
-BOT_API_URL = "https://surprising-perfection-production-e015.up.railway.app/api/bot-stats"
-
 @app.get("/api/stats")
 async def get_stats():
     try:
-        print(f"Dashboard calling bot API: {BOT_API_URL}")
         async with aiohttp.ClientSession() as session:
-            async with session.get(
-                BOT_API_URL, 
-                timeout=aiohttp.ClientTimeout(total=10),
-                ssl=False
-            ) as resp:
-                print(f"Bot API response: {resp.status}")
+            async with session.get("https://surprising-perfection-production-e015.up.railway.app:8001/api/bot-stats", timeout=aiohttp.ClientTimeout(total=5)) as resp:
                 if resp.status == 200:
-                    data = await resp.json()
-                    print(f"Got bot data: {data}")
-                    return data
-                else:
-                    print(f"Bot API error: {resp.status}")
+                    return await resp.json()
     except Exception as e:
-        print(f"Exception calling bot API: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"Bot API error: {e}")
     
-    print("Returning fallback data")
     return {
         "guilds": 0,
         "verified_users": 0,
