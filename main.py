@@ -9,22 +9,21 @@ app = FastAPI()
 BOT_API_URL = "https://surprising-perfection-production-e015.up.railway.app:8001/api/bot-stats"
 
 @app.get("/api/stats")
+@app.get("/api/stats")
 async def get_stats():
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(BOT_API_URL, timeout=aiohttp.ClientTimeout(total=3), ssl=False) as resp:
+            # 타임아웃을 10초로 늘림
+            async with session.get(
+                BOT_API_URL, 
+                timeout=aiohttp.ClientTimeout(total=10),  # ← 3에서 10으로
+                ssl=False
+            ) as resp:
                 if resp.status == 200:
-                    data = await resp.json()
-                    print(f"Bot API success: {data}")
-                    return data
-                else:
-                    print(f"Bot API error: {resp.status}")
-    except asyncio.TimeoutError:
-        print("Bot API timeout")
+                    return await resp.json()
     except Exception as e:
         print(f"Bot API error: {e}")
     
-    # Fallback
     return {
         "guilds": 0,
         "verified_users": 0,
@@ -41,3 +40,4 @@ def get_errors():
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+
