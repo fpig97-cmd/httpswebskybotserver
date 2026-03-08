@@ -4,7 +4,14 @@ import os
 
 app = FastAPI()
 
-# static 폴더 경로 확인
-static_dir = os.path.join(os.path.dirname(__file__), "static")
+@app.get("/api/stats")
+def get_stats():
+    return {
+        "servers": 42,
+        "users": 1250,
+        "warnings": 18,
+        "status": "online"
+    }
 
+static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
