@@ -10,7 +10,16 @@ async def get_stats():
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get("https://surprising-perfection-production-e015.up.railway.app:8001/api/bot-stats", timeout=aiohttp.ClientTimeout(total=5)) as resp:
-
+                if resp.status == 200:
+                    return await resp.json()
+    except Exception as e:
+        print(f"Bot API error: {e}")
+    
+    return {
+        "guilds": 0,
+        "verified_users": 0,
+        "warn_records": 0,
+    }
 
 @app.get("/api/errors")
 def get_errors():
@@ -22,4 +31,3 @@ def get_errors():
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
-
