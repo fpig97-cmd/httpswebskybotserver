@@ -5,7 +5,8 @@ import aiohttp
 
 app = FastAPI()
 
-BOT_API_URL = "https://surprising-perfection-production-e015.up.railway.app:8001/api/bot-stats"
+BOT_API_URL = "https://surprising-perfection-production-e015.up.railway.app/api/bot-stats"
+# 포트 번호 빼기 (기본 443 HTTPS)
 
 @app.get("/api/stats")
 async def get_stats():
@@ -17,9 +18,7 @@ async def get_stats():
                 ssl=False
             ) as resp:
                 if resp.status == 200:
-                    data = await resp.json()
-                    print(f"Bot API success: {data}")
-                    return data
+                    return await resp.json()
     except Exception as e:
         print(f"Bot API error: {e}")
     
@@ -39,5 +38,6 @@ def get_errors():
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+
 
 
