@@ -10,22 +10,22 @@ BOT_API_URL = "https://surprising-perfection-production-e015.up.railway.app/api/
 @app.get("/api/stats")
 async def get_stats():
     try:
-        print(f"Calling bot API: {BOT_API_URL}")
+        print(f"Dashboard calling bot API: {BOT_API_URL}")
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 BOT_API_URL, 
                 timeout=aiohttp.ClientTimeout(total=10),
                 ssl=False
             ) as resp:
-                print(f"Bot API response status: {resp.status}")
+                print(f"Bot API response: {resp.status}")
                 if resp.status == 200:
                     data = await resp.json()
-                    print(f"Bot API success: {data}")
+                    print(f"Got bot data: {data}")
                     return data
                 else:
-                    print(f"Bot API error: status {resp.status}")
+                    print(f"Bot API error: {resp.status}")
     except Exception as e:
-        print(f"Bot API exception: {e}")
+        print(f"Exception calling bot API: {e}")
         import traceback
         traceback.print_exc()
     
