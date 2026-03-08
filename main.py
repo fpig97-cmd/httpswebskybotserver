@@ -5,15 +5,28 @@ import aiohttp
 
 app = FastAPI()
 
+# ✅ Bot의 실제 공개 도메인
+BOT_API_URL = "https://fortunate-emotion-production-e4f7.up.railway.app/api/bot-stats"
+
 @app.get("/api/stats")
 async def get_stats():
     try:
+        print(f"Calling bot API: {BOT_API_URL}")
         async with aiohttp.ClientSession() as session:
-            async with session.get("https://fortunate-emotion-production-e4f7.up.railway.app", timeout=aiohttp.ClientTimeout(total=10), ssl=False) as resp:
+            async with session.get(
+                BOT_API_URL, 
+                timeout=aiohttp.ClientTimeout(total=10),
+                ssl=False
+            ) as resp:
+                print(f"Bot API response: {resp.status}")
                 if resp.status == 200:
-                    return await resp.json()
+                    data = await resp.json()
+                    print(f"Got bot data: {data}")
+                    return data
+                else:
+                    print(f"Bot API error: {resp.status}")
     except Exception as e:
-        print(f"Bot API error: {e}")
+        print(f"Exception: {e}")
     
     return {
         "guilds": 0,
@@ -31,8 +44,3 @@ def get_errors():
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
-
-
-
-
-
