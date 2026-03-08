@@ -90,8 +90,8 @@
             <img src="/SKY.png" alt="Sky Army" class="logo-img" />
           </div>
           <div>
-            <div class="logo-text-title">스카이 부대</div>
-            <div class="logo-text-sub">Sky Army Dashboard</div>
+            <div class="logo-text-title">스카이 부대 봇</div>
+            <div class="logo-text-sub">Sky Army Bot Dashboard</div>
           </div>
         </div>
         <div class="divider"></div>
@@ -165,9 +165,25 @@
       return res.json();
     }
 
-    function setText(id, value) {
+    function animateNumber(id, targetValue, duration = 800) {
       const el = document.getElementById(id);
-      if (el) el.textContent = value;
+      if (!el) return;
+      
+      const startValue = 0;
+      const startTime = Date.now();
+      
+      function update() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const currentValue = Math.floor(startValue + (targetValue - startValue) * progress);
+        el.textContent = currentValue;
+        
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        }
+      }
+      
+      update();
     }
 
     function setLogEntries(entries) {
@@ -188,7 +204,7 @@
         String(now.getDate()).padStart(2,"0") + " " +
         String(now.getHours()).padStart(2,"0") + ":" +
         String(now.getMinutes()).padStart(2,"0");
-      setText("last-updated", "마지막 갱신: " + s);
+      document.getElementById("last-updated").textContent = "마지막 갱신: " + s;
     }
 
     async function refreshAll() {
@@ -201,13 +217,13 @@
         const verified = stats.verified_users ?? 0;
         const warns = stats.warn_records ?? 0;
 
-        setText("stat-guilds", guilds);
-        setText("stat-verified", verified);
-        setText("stat-warns", warns);
+        animateNumber("stat-guilds", guilds, 800);
+        animateNumber("stat-verified", verified, 800);
+        animateNumber("stat-warns", warns, 800);
 
-        setText("card-guilds", guilds);
-        setText("card-verified", verified);
-        setText("card-warns", warns);
+        animateNumber("card-guilds", guilds, 800);
+        animateNumber("card-verified", verified, 800);
+        animateNumber("card-warns", warns, 800);
 
         setLogEntries(errors);
         updateTimestamp();
@@ -224,4 +240,3 @@
   </script>
 </body>
 </html>
-
