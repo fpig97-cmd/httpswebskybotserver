@@ -5,54 +5,116 @@ import aiohttp
 
 app = FastAPI()
 
-# ✅ Bot의 실제 공개 도메인
-BOT_API_URL = "https://fortunate-emotion-production-e4f7.up.railway.app/api/bot-stats"
+# 🔗 봇 API 주소 (봇 레포 Railway 주소)
+BOT_URL = "https://fortunate-emotion-production-e4f7.up.railway.app/api/bot-stats"
+
+# -----------------------------
+# BOT STATS
+# -----------------------------
 
 @app.get("/api/stats")
 async def get_stats():
     try:
-        print(f"Calling bot API: {BOT_API_URL}")
         async with aiohttp.ClientSession() as session:
-            async with session.get(
-                BOT_API_URL, 
-                timeout=aiohttp.ClientTimeout(total=10),
-                ssl=False
-            ) as resp:
-                print(f"Bot API response: {resp.status}")
+            async with session.get(f"{BOT_URL}/api/bot-stats") as resp:
+
                 if resp.status == 200:
-                    data = await resp.json()
-                    print(f"Got bot data: {data}")
-                    return data
-                else:
-                    print(f"Bot API error: {resp.status}")
+                    return await resp.json()
+
     except Exception as e:
-        print(f"Exception: {e}")
-    
+        print("Stats error:", e)
+
     return {
         "guilds": 0,
         "verified_users": 0,
-        "warn_records": 0,
+        "warn_records": 0
     }
 
-@app.get("/api/errors")
-async def get_errors():
-    """Bot에서 에러 로그 가져오기"""
+
+# -----------------------------
+# ECONOMY STATS
+# -----------------------------
+
+@app.get("/api/economy/stats")
+async def economy_stats():
+
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(
-                "https://fortunate-emotion-production-e4f7.up.railway.app/api/errors",
-                timeout=aiohttp.ClientTimeout(total=5),
-                ssl=False
-            ) as resp:
+
+            async with session.get(f"{BOT_URL}/api/economy/stats") as resp:
+
                 if resp.status == 200:
-                    data = await resp.json()
-                    print(f"Got {len(data)} error logs")
-                    return data
+                    return await resp.json()
+
     except Exception as e:
-        print(f"Error logs API error: {e}")
-    
+        print("Economy stats error:", e)
+
+    return {
+        "total_money":0,
+        "users":0,
+        "avg_money":0
+    }
+
+
+# -----------------------------
+# LEADERBOARD
+# -----------------------------
+
+@app.get("/api/economy/leaderboard")
+async def leaderboard():
+
+    try:
+        async with aiohttp.ClientSession() as session:
+
+            async with session.get(f"{BOT_URL}/api/economy/leaderboard") as resp:
+
+                if resp.status == 200:
+                    return await resp.json()
+
+    except Exception as e:
+        print("Leaderboard error:", e)
+
     return []
 
-static_dir = os.path.join(os.path.dirname(__file__), "static")
-app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
+# -----------------------------
+# GRAPH
+# -----------------------------
+
+@app.get("/api/economy/graph")
+async def graph():
+
+    try:
+        async with aiohttp.ClientSession() as session:
+
+            async with session.get(f"{BOT_URL}/api/economy/graph") as resp:
+
+                if resp.status == 200:
+                    return await resp.json()
+
+    except Exception as e:
+        print("Graph error:", e)
+
+    return []
+
+
+# -----------------------------
+# ERRORS
+# -----------------------------
+
+@app.get("/api/errors")
+async def errors():
+    return []
+
+
+# -----------------------------
+# STATIC DASHBOARD
+# -----------------------------
+
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+
+app.mount(
+    "/",
+    StaticFiles(directory=static_dir, html=True),
+    name="static"
+        )
